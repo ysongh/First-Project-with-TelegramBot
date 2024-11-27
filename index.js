@@ -62,6 +62,27 @@ app.post('/send-media', async (req, res) => {
   }
 });
 
+app.post('/send-location', async (req, res) => {
+  const { chatId, latitude, longitude } = req.body;
+  try {
+    const response = await fetch(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendLocation`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          latitude,
+          longitude
+        })
+      }
+    );
+    res.json(await response.json());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
