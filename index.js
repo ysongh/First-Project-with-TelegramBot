@@ -3,10 +3,12 @@ require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const Resend = require("resend");
 
 const app = express();
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
+const resend = new Resend.Resend(process.env.RESEND_APIKEY);
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -81,6 +83,21 @@ app.post('/send-location', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+app.get("/send-email", async (req, res) => {
+  const { data, error } = await resend.emails.send({
+    from: "Acme <onboarding@resend.dev>",
+    to: ["delivered@resend.dev"],
+    subject: "hello world",
+    html: "<strong>it works!</strong>",
+  });
+
+  if (error) {
+    return res.status(400).json({ error });
+  }
+
+  res.status(200).json({ data });
 });
 
 app.listen(port, () => {
